@@ -1,4 +1,4 @@
-four51.app.controller('CheckOutViewCtrl', function ($scope, $location, $filter, $rootScope, $451, User, Order, FavoriteOrder, AddressList, Shipper, Coupon, SpendingAccount, Address) {
+four51.app.controller('CheckOutViewCtrl', function ($scope, $location, $filter, $rootScope, $451, User, Order, FavoriteOrder, AddressList, Shipper, Coupon, SpendingAccount, Address, USFoodShippers) {
 	if (!$scope.currentOrder) {
         $location.path('catalog');
     }
@@ -26,6 +26,10 @@ four51.app.controller('CheckOutViewCtrl', function ($scope, $location, $filter, 
 	$scope.shipToMultipleAddresses = shipToMultipleAddresses();
 
 	$scope.updateShipper = function(li) {
+		console.log($scope.currentOrder.LineItems[0].ShipperName);
+		if ($scope.currentOrder.LineItems[0].ShipperName.indexOf('FedEx') == -1)
+			$scope.currentOrder.LineItems[0].ShipAccount = '';
+
 		$scope.shippingUpdatingIndicator = true;
 		$scope.shippingFetchIndicator = true;
 		if (!$scope.shipToMultipleAddresses) {
@@ -265,4 +269,6 @@ four51.app.controller('CheckOutViewCtrl', function ($scope, $location, $filter, 
     });
 
     $scope.checkOutSection = 'order';
+	$scope.currentOrder.CostCenter = $scope.user.CustomFields[0].Value;
+	$scope.shipAccounts = USFoodShippers.accounts[$scope.user.CustomFields[0].Value];
 });

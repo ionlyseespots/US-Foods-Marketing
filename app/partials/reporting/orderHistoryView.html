@@ -32,6 +32,9 @@
                     <div ng-if="!(user.Permissions.contains('HidePricing'))" class="panel-body text-left">
                         <orderhistorysummary></orderhistorysummary>
                     </div>
+                    <div class="OrderConfirmation">
+                         <span>Stock items and non-stock items will be shipped separately.</span>
+                    </div>
                     <div class="panel-footer" ng-if="order.FromUserID == user.ID">
                         <div class="order-history-view-repeat">
                             <button ng-disabled="currentOrder" class="btn btn-primary" ng-click="repeatOrder()">Repeat Order</button>

@@ -15,6 +15,19 @@
                 <p><span class="text-info">Subtotal:</span> {{currentOrder.Subtotal | currency}}</p>
                 <p><span class="text-info">Shipping Costs:</span> {{currentOrder.ShippingCost | currency}}</p>
                 <p><span class="text-info">Tax:</span> {{currentOrder.Tax || 0 | currency}}</p>
+                <p>
+                    <span class="text-info">Ship To:</span>
+                    <p ng-show="ShipAddress.AddressName"><small>{{ShipAddress.AddressName}}</small></p>
+                    <p ng-show="ShipAddress.CompanyName"><small>{{ShipAddress.CompanyName}}</small></p>
+                    <p ng-show="ShipAddress.FirstName || ShipAddress.LastName"><small>{{ShipAddress.FirstName + ' ' + ShipAddress.LastName}}</small></p>
+                    <p ng-show="ShipAddress.Street1"><small>{{ShipAddress.Street1}}</small></p>
+                    <p ng-show="ShipAddress.Street2"><small>{{ShipAddress.Street2}}</small></p>
+                    <p ng-show="ShipAddress.City || ShipAddress.State || ShipAddress.Zip"><small>{{ShipAddress.City}}, {{ShipAddress.State}} {{ShipAddress.Zip}}</small></p>
+                    <p ng-show="ShipAddress.Phone"><small>{{ShipAddress.Phone}}</small></p>
+                </p>
+                <p><span class="text-info">Bill-To Cost Center:</span> {{currentOrder.CostCenter}}</p>
+                <p><span class="text-info">Ship-To Cost Center:</span> {{currentOrder.CostCenter}}</p>
+                <p><span class="text-info">Contact Phone:</span> {{currentOrder.OrderFields[0].Value}}</p>
                 <div ng-show="user.Permissions.contains('ViewPromotions')">
                     <div ng-show="!currentOrder.Coupon">
                         <div class="form-group view-form-icon">
@@ -83,9 +96,9 @@
                     <i class="fa fa-edit"></i>
                 </div>
                 <div ng-if="user.Permissions.contains('CostCenterPerOrder') && !user.Permissions.contains('CostCenterPerLine')">
-                    <label ng-show="currentOrder.CostCenter">Cost Center</label>
+                    <label ng-show="currentOrder.CostCenter">Bill-To Cost Center</label>
                     <select class="form-control" required ng-if="user.CostCenters.length > 1 && !user.Permissions.contains('FreeFormCostCenter')" ng-options="center.Name as center.Name for center in user.CostCenters" ng-model="currentOrder.CostCenter"></select>
-                    <input class="form-control" ng-if="user.Permissions.contains('FreeFormCostCenter')" ng-model="currentOrder.CostCenter" type='text' required placeholder="Cost Center" />
+                    <input class="form-control" ng-if="user.Permissions.contains('FreeFormCostCenter')" ng-model="currentOrder.CostCenter" type='text' required placeholder="Bill-To Cost Center" />
                     <span ng-if="user.CostCenters.length == 1 && !user.Permissions.contains('FreeFormCostCenter')">{{currentOrder.CostCenter}}</span>
                 </div>
                 <ul ng-if="currentOrder.OrderFields">
@@ -101,7 +114,7 @@
         <div class="panel-heading"  ng-class="{'no': cart_shipping.$invalid, 'yes': !cart_shipping.$invalid }" ng-click="showSuccessAlert = false">
             <h3 ng-click="checkOutSection = 'shipping'" class="panel-title panel-primary">
                 <i ng-class="{'fa fa-warning': cart_shipping.$invalid, 'fa fa-check-circle': !cart_shipping.$invalid }"></i>
-                Shipping
+                Ship to a US Foods location
                 <i ng-class="{'fa fa-caret-down': checkOutSection == 'shipping', 'fa fa-caret-up': checkOutSection == 'order' || checkOutSection == 'billing' }"></i>
             </h3>
         </div>
@@ -126,78 +139,85 @@
                                 New Address
                              </button>
                         </span>
-                    <div>
-                        <loadingindicator ng-show="shippingUpdatingIndicator" title="Please wait while shipping costs are updated" />
-                        <loadingindicator ng-show="shippingFetchIndicator" title="Please wait while available shippers are updated" />
                         <div>
-                            <div ng-show="!shipToMultipleAddresses" class="view-form-icon">
-                                <div ng-show="(addresses | filter:{IsShipping:true}).length > 0">
-                                    <label ng-class="{required: !shipToMultipleAddresses}" ng-show="currentOrder.ShipAddressID || !shipToMultipleAddresses">Shipping Address</label>
-                                    <div>
+                            <loadingindicator ng-show="shippingUpdatingIndicator" title="Please wait while shipping costs are updated" />
+                            <loadingindicator ng-show="shippingFetchIndicator" title="Please wait while available shippers are updated" />
+                            <div>
+                                <div ng-show="!shipToMultipleAddresses" class="view-form-icon">
+                                    <div ng-show="(addresses | filter:{IsShipping:true}).length > 0">
+                                        <label ng-class="{required: !shipToMultipleAddresses}" ng-show="currentOrder.ShipAddressID || !shipToMultipleAddresses">Ship to a US Foods location</label>
+                                        <div>
+                                            <select class="form-control" name="shippingAddress"
+                                                    ng-change="setShipAddressAtOrderLevel()"
+                                                    ng-options="address.ID as address.AddressName for address in addresses | filter:{IsShipping:true}"
+                                                    ng-model="currentOrder.ShipAddressID"
+                                                    ng-required="!shipToMultipleAddresses">
+                                                <option class="view-select-placeholder" value="" selected>Ship to a US Foods location</option>
+                                            </select>
+                                            <i class="fa fa-map-marker"></i>
+                                        </div>
+                                    </div>
+                                    <div ng-show="user.ShipMethod != null && shippers">
+                                        <label ng-class="{required: !shipToMultipleAddresses && user.ShipMethod != null}" ng-show="currentOrder.LineItems[0].ShipperName || !shipToMultipleAddresses && user.ShipMethod != null">Shipping Method</label>
+                                        <select class="form-control" ng-change="updateShipper()"
+                                                ng-model="currentOrder.LineItems[0].ShipperName"
+                                                ng-show="user.ShipMethod.ShipperSelectionType == 'UserDropDown'"
+                                                ng-options="shipper.Name as shipper.Name for shipper in shippers"
+                                                ng-required="!shipToMultipleAddresses && user.ShipMethod != null" >
+                                            <option class="view-select-placeholder" value="" selected>Shipping Method</option>
+                                        </select>
+                                        <i class="fa fa-truck"></i>
+                                    </div>
+                                </div>
+                                <div ng-show="!shipToMultipleAddresses && ShipAddress" class="check-out-view-selected-shipping" style="border: 1px solid #d6d6d6; padding: 15px; margin-top: 15px;">
+                                    <p style="font-size: 11px; font-weight: bold;">Shipping Location</p>
+                                    <p ng-show="ShipAddress.AddressName"><small>{{ShipAddress.AddressName}}</small></p>
+                                    <p ng-show="ShipAddress.CompanyName"><small>{{ShipAddress.CompanyName}}</small></p>
+                                    <p ng-show="ShipAddress.FirstName || ShipAddress.LastName"><small>{{ShipAddress.FirstName + ' ' + ShipAddress.LastName}}</small></p>
+                                    <p ng-show="ShipAddress.Street1"><small>{{ShipAddress.Street1}}</small></p>
+                                    <p ng-show="ShipAddress.Street2"><small>{{ShipAddress.Street2}}</small></p>
+                                    <p ng-show="ShipAddress.City || ShipAddress.State || ShipAddress.Zip"><small>{{ShipAddress.City}}<span ng-if="ShipAddress.City && ShipAddress.State">, </span> {{ShipAddress.State}} {{ShipAddress.Zip}}</small></p>
+                                    <p ng-show="ShipAddress.Phone"><small>{{ShipAddress.Phone}}</small></p>
+                                </div>
+                                <div style="clear:both;"></div>
+                            </div>
+                        </div>
+                        <div style="margin-top:15px;" ng-show="shipToMultipleAddresses">
+                            <div class="check-out-view-multiple-shipping">
+                                <div class="row view-form-icon" ng-class="{'ng-repeater-even-row': $even}" ng-repeat="item in currentOrder.LineItems">
+                                    <div class="col-xs-12 col-sm-4"><strong>{{item.Product.Name}}</strong><small>{{' x ' + item.Quantity}}</small><br/>
+                                        <span class="text-info">{{item.DateNeeded | date:'MM/dd/yyyy' }}</span></div>
+                                    <div class="col-xs-12 col-sm-4">
+                                        <label ng-class="{required: shipToMultipleAddresses}" ng-show="currentOrder.ShipAddressID || shipToMultipleAddresses">Shipping Address</label>
                                         <select class="form-control" name="shippingAddress"
-                                                ng-change="setShipAddressAtOrderLevel()"
                                                 ng-options="address.ID as address.AddressName for address in addresses | filter:{IsShipping:true}"
-                                                ng-model="currentOrder.ShipAddressID"
-                                                ng-required="!shipToMultipleAddresses">
-                                            <option class="view-select-placeholder" value="" selected>Shipping Address</option>
+                                                ng-model="item.ShipAddressID"
+                                                ng-required="shipToMultipleAddresses" >
                                         </select>
                                         <i class="fa fa-map-marker"></i>
                                     </div>
-                                </div>
-                                <div ng-show="user.ShipMethod != null && shippers">
-                                    <label ng-class="{required: !shipToMultipleAddresses && user.ShipMethod != null}" ng-show="currentOrder.LineItems[0].ShipperName || !shipToMultipleAddresses && user.ShipMethod != null">Shipping Method</label>
-                                    <select class="form-control" ng-change="updateShipper()"
-                                            ng-model="currentOrder.LineItems[0].ShipperName"
-                                            ng-show="user.ShipMethod.ShipperSelectionType == 'UserDropDown'"
-                                            ng-options="shipper.Name as shipper.Name for shipper in shippers"
-                                            ng-required="!shipToMultipleAddresses && user.ShipMethod != null" >
-                                        <option class="view-select-placeholder" value="" selected>Shipping Method</option>
-                                    </select>
-                                    <i class="fa fa-truck"></i>
-                                </div>
-                            </div>
-                            <div ng-show="!shipToMultipleAddresses && ShipAddress" class="check-out-view-selected-shipping" style="border: 1px solid #d6d6d6; padding: 15px; margin-top: 15px;">
-                                <p style="font-size: 11px; font-weight: bold;">Shipping Location</p>
-                                <p ng-show="ShipAddress.AddressName"><small>{{ShipAddress.AddressName}}</small></p>
-                                <p ng-show="ShipAddress.CompanyName"><small>{{ShipAddress.CompanyName}}</small></p>
-                                <p ng-show="ShipAddress.FirstName || ShipAddress.LastName"><small>{{ShipAddress.FirstName + ' ' + ShipAddress.LastName}}</small></p>
-                                <p ng-show="ShipAddress.Street1"><small>{{ShipAddress.Street1}}</small></p>
-                                <p ng-show="ShipAddress.Street2"><small>{{ShipAddress.Street2}}</small></p>
-                                <p ng-show="ShipAddress.City || ShipAddress.State || ShipAddress.Zip"><small>{{ShipAddress.City}}<span ng-if="ShipAddress.City && ShipAddress.State">, </span> {{ShipAddress.State}} {{ShipAddress.Zip}}</small></p>
-                                <p ng-show="ShipAddress.Phone"><small>{{ShipAddress.Phone}}</small></p>
-                            </div>
-                            <div style="clear:both;"></div>
-                        </div>
-                    </div>
-                    <div style="margin-top:15px;" ng-show="shipToMultipleAddresses">
-                        <div class="check-out-view-multiple-shipping">
-                            <div class="row view-form-icon" ng-class="{'ng-repeater-even-row': $even}" ng-repeat="item in currentOrder.LineItems">
-                                <div class="col-xs-12 col-sm-4"><strong>{{item.Product.Name}}</strong><small>{{' x ' + item.Quantity}}</small><br/>
-                                    <span class="text-info">{{item.DateNeeded | date:'MM/dd/yyyy' }}</span></div>
-                                <div class="col-xs-12 col-sm-4">
-                                    <label ng-class="{required: shipToMultipleAddresses}" ng-show="currentOrder.ShipAddressID || shipToMultipleAddresses">Shipping Address</label>
-                                    <select class="form-control" name="shippingAddress"
-                                            ng-options="address.ID as address.AddressName for address in addresses | filter:{IsShipping:true}"
-                                            ng-model="item.ShipAddressID"
-                                            ng-required="shipToMultipleAddresses" >
-                                    </select>
-                                    <i class="fa fa-map-marker"></i>
-                                </div>
-                                <div class="col-xs-12 col-sm-4">
-                                    <label ng-class="{required: shipToMultipleAddresses && user.ShipMethod != null}" ng-show="currentOrder.LineItems[0].ShipperName || shipToMultipleAddresses && user.ShipMethod != null">Shipping Method</label>
-                                    <select class="form-control" ng-change="updateShipper(item)"
-                                            ng-show="user.ShipMethod.ShipperSelectionType == 'UserDropDown'"
-                                            ng-options="shipper.Name as shipper.Name for shipper in shippers | noliverates"
-                                            ng-model="item.ShipperName"
-                                            ng-required="shipToMultipleAddresses && user.ShipMethod != null" >
-                                     </select>
-                                    <i class="fa fa-truck"></i>
+                                    <div class="col-xs-12 col-sm-4">
+                                        <label ng-class="{required: shipToMultipleAddresses && user.ShipMethod != null}" ng-show="currentOrder.LineItems[0].ShipperName || shipToMultipleAddresses && user.ShipMethod != null">Shipping Method</label>
+                                        <select class="form-control" ng-change="updateShipper(item)"
+                                                ng-show="user.ShipMethod.ShipperSelectionType == 'UserDropDown'"
+                                                ng-options="shipper.Name as shipper.Name for shipper in shippers | noliverates"
+                                                ng-model="item.ShipperName"
+                                                ng-required="shipToMultipleAddresses && user.ShipMethod != null" >
+                                         </select>
+                                        <i class="fa fa-truck"></i>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                    <label ng-show="currentOrder.LineItems[0].ShipAccount">Ship Account: </label>
-                    <input class="form-control" ng-if="user.ShipMethod.AskForAccountNumber" placeholder="Shipping Account Number" type="text" ng-model="currentOrder.LineItems[0].ShipAccount" />
+                        <div ng-show="currentOrder.LineItems[0].ShipperName.indexOf('FedEx') > -1">
+                            <label ng-show="currentOrder.LineItems[0].ShipAccount">Select Your Shipping Account Number: </label>
+                            <div>
+                                <select class="form-control" name="shipaccount" ng-required="currentOrder.LineItems[0].ShipperName.indexOf('FedEx') > -1" ng-options="account for account in shipAccounts" ng-model="currentOrder.LineItems[0].ShipAccount">
+                                    <option class="view-select-placeholder" value="" selected>Select Your Shipping Account Number</option>
+                                </select>
+                                <i class="fa fa-truck"></i>
+                            </div>
+                        </div>
                     </form>
                 </div>
             </div>
@@ -252,6 +272,7 @@
 
         <div class="view-footer navbar-fixed-bottom">
             <div class="error_list">
+                <div class="view-action-message alert-warning" ng-show="cart_shipping.shipaccount.$invalid">Shipping Account Number required for FedEx Shippers.</div>
                 <div class="view-action-message alert-warning" ng-show="couponError">{{couponError}}</div>
                 <div class="view-action-message alert-warning" ng-show="cart_order.orderid.$invalid">Enter an order id</div>
                 <div class="view-action-message alert-warning" ng-show="cart_shipping.shippingAddress.$invalid">Please choose a shipping address</div>

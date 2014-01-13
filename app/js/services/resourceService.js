@@ -337,7 +337,7 @@ four51.app.factory('Resources', function() {
     ];
 
     return {
-        countries:  countries,
+        countries: countries,
         states: states
     };
 });

@@ -59,7 +59,7 @@
                             <p ng-show="item.DateNeeded">Date Needed: {{item.DateNeeded | date: 'MM/dd/yy'}}</p>
                         </div>
                         <div ng-if="user.Permissions.contains('CostCenterPerLine')">
-                            <p ng-show="item.CostCenter">Cost Center: {{item.CostCenter}}</p>
+                            <p ng-show="item.CostCenter">Bill-To Cost Center: {{item.CostCenter}}</p>
                         </div>
                     </div>
                 </div>

@@ -37,14 +37,33 @@
         <section ng-controller="ErrorCtrl">
             <ng-include src="template.url" />
         </section>
-        <br/>
-        <br/>
-        <div ng-if="!user.Permissions.contains('UnBrandedSite')" style="text-align:right; padding:6px 25px 3px 0; font-size:9pt; font-family:Tahoma,Verdana,Arial;">
-            <div>
-                <div><b>Powered by <a href="http://www.four51.com/public/index.php/help" target="_new">Four51°</a></b></div>
-                <div>Copyright © 2013 Four51 Inc. <br>All Rights Reserved.</div>
-                <div ng-if="!(user.Permissions.contains('HideTerms'))"><a href="#/conditions">Conditions of Use</a></div>
-            </div>
+        <br/><br />
+        <div style="text-align:right; padding:6px 25px 3px 0; font-size:9pt; font-family:Tahoma,Verdana,Arial;">
+            <footer id="cos4">
+                <ul>
+                    <li>
+                        <a href="docs/USF_BrandGuidelines-1.06b.pdf" target="_blank">Brand Guidelines</a>
+                    </li>
+                    <li>
+                        <a href="flyers.html" onclick="return !window.open(this.href, 'Flyers', 'width=800,height=700')" target="_blank">Flyers</a>
+                    </li>
+                    <li>
+                        <a href="http://www.surveymonkey.com/s/TheMarketingStore" target="_blank">Feedback</a>
+                    </li>
+
+                </ul>
+                <a href="/UI/Customer.aspx?p=terms" class="conditionsLink">Conditions of Use</a>
+                <hr/>
+            </footer>
+            <span class="ContactUs">
+                <span style="color: red;">HELP DESK / FEEDBACK:</span><br />
+                Questions or Feedback?<br />
+                E-mail or call us at any time.<br />
+                Email: <a href="mailto:helpdesk@supplylogic.com">helpdesk@supplylogic.com</a><br />
+                Toll Free : (877) 767-5644 x1<br />
+                Local Ph: (631) 361-8020 x1<br />
+                Fax: (631) 360-8010
+            </span>
         </div>
     </section>
 </section>
@@ -119,6 +138,7 @@
     <script src="js/services/shipperService.js"></script>
     <script src="js/services/couponService.js"></script>
     <script src="js/services/resourceService.js"></script>
+    <script src="js/services/usfoodShippers.js"></script>
 
     <script src="js/factories/fileReader.js"></script>
 

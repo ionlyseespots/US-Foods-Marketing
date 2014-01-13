@@ -4,3 +4,46 @@ Version: 1.0
 Template: Welcome
 */
 
+.navbar-default .navbar-collapse,
+.navbar-default .navbar-form {
+    border-color: #5C8727;
+    background-color: #5C8727;
+}
+
+.navbar-inverse .navbar-collapse,
+.navbar-inverse .navbar-form {
+    border-color: #5C8727;
+    background-color: #5C8727;
+}
+
+.navbar-default .navbar-nav > .active > a, .navbar-default .navbar-nav > .active > a:hover, .navbar-default .navbar-nav > .active > a:focus {
+    background-color: #3c5a1b;
+    color: #FFFFFF;
+}
+
+.dropdown-menu {
+    background-color: #5C8727;
+}
+
+.navbar-default .navbar-nav > .open > a, .navbar-default .navbar-nav > .open > a:hover, .navbar-default .navbar-nav > .open > a:focus {
+    background-color: #3c5a1b;
+    color: #FFFFFF;
+}
+
+.header .fa-caret-down {
+    bottom: -20px;
+    color: #3c5a1b;
+    font-size: 32px;
+    position: absolute;
+    right: 35%;
+    z-index: 5;
+}
+
+li.cart span.badge {
+    background-color: #3D3D3D;
+    left: -30px;
+    padding: 4px 7px;
+    position: absolute;
+    top: 10px;
+    z-index: 999999999;
+}
