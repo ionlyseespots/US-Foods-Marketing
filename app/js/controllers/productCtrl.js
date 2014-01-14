@@ -53,6 +53,37 @@ four51.app.controller('ProductCtrl', function ($routeParams, $scope, Product, Pr
 			$scope.variantLineItemsOrderTotal += item.LineTotal || 0;
 		})
 	};
+
+	$scope.$watch('LineItem.Specs.DECORATION.SelectedOptionID', function(newValue) {
+		$scope.selectedDecorationOption = null;
+		if (!newValue) return;
+		angular.forEach($scope.LineItem.Specs.DECORATION.Options, function(o) {
+			if (o.ID == newValue) {
+				$scope.selectedDecorationOption = o.Markup > 0 ? o : null;
+			}
+		});
+	});
+
+	$scope.$watch('LineItem.Specs.SIZE.SelectedOptionID', function(newValue) {
+		$scope.selectedSizeOption = null;
+		if (!newValue) return;
+		angular.forEach($scope.LineItem.Specs.SIZE.Options, function(o) {
+			if (o.ID == newValue) {
+				$scope.selectedSizeOption = o.Markup > 0 ? o : null;
+			}
+		});
+	});
+
+	$scope.$watch('LineItem.Specs.PERSONALIZATION.SelectedOptionID', function(newValue) {
+		$scope.selectedPersonalizationOption = null;
+		if (!newValue) return;
+		angular.forEach($scope.LineItem.Specs.PERSONALIZATION.Options, function(o) {
+			if (o.ID == newValue) {
+				$scope.selectedPersonalizationOption = o.Markup > 0 ? o : null;
+			}
+		});
+	});
+
 	ProductDisplayService.getProductAndVariant($routeParams.productInteropID,$routeParams.variantInteropID, function(data){
 		$scope.LineItem.Product = data.product;
 		$scope.LineItem.Variant = data.variant;
