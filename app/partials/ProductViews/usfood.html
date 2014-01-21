@@ -1,0 +1,132 @@
+<section id="451_area_prod_desc" class="container product-view-default">
+    <loadingindicator ng-show="loadingIndicator" title="Please wait while we fetch product information" />
+    <productnav product="LineItem.Product" variant="LineItem.Variant" />
+
+
+    <div class="col-md-5 col-collapse" ng-show="LineItem.Variant.LargeImageUrl || LineItem.Product.LargeImageUrl || LineItem.Variant.PreviewUrl">
+        <figure style="background-color:#fff;">
+            <a ng-href="{{LineItem.Product.StaticSpecGroups.PDF.Specs.PDF.FileURL}}">
+                <img id="451_img_prod_lg" ng-src="{{LineItem.Variant.PreviewUrl || LineItem.Variant.LargeImageUrl || LineItem.Product.LargeImageUrl}}">
+            </a>
+        </figure>
+    </div>
+
+    <div class="col-md-6 col-md-offset-1 col-collapse">
+        <!--BASIC PRODUCT INFO!-->
+        <h2 class="text-success pull-right" ng-show="LineItem.PriceSchedule.PriceBreaks.length == 1" ng-if="!(user.Permissions.contains('HidePricing'))">
+            {{LineItem.PriceSchedule.PriceBreaks[0].Price | currency}}
+        </h2>
+        <h2 ng-hide="LineItem.Variant.ExternalID">Item ID: {{LineItem.Product.Name}}</h2>
+        <h2 ng-show="LineItem.Variant.ExternalID">Item ID: {{LineItem.Variant.ExternalID}}</h2>
+
+        <!--VARIANT LIST TABLE!-->
+        <form name="addToOrderForm">
+            <div class="panel panel-default">
+                <div ng-show="LineItem.PriceSchedule">
+                    <priceScheduleTable ps='LineItem.PriceSchedule' p='LineItem.Product'/>
+                    <div class="alert alert-info"><small>Note: Price may be adjusted based on the options you select. Item Total will reflect these adjustments.</small></div>
+                </div>
+                <div class="panel-body" style="position: relative;">
+                    <loadingindicator ng-show="addToOrderIndicator" title="Adding product to cart"/>
+                    <div ng-if="LineItem.Product.Variants.length > 0 && !LineItem.Variant">
+                        <div class="row">
+                            <div class="col-sm-6"><h4>Choose a variant:</h4></div>
+                            <div class="col-sm-6"><input ng-model="queryVariants" type="text" class="form-control" placeholder="Filter variants"/></div>
+                        </div>
+
+                        <div class="product-view-default-variant-box">
+                            <div class="list-group" ng-repeat="v in LineItem.Product.Variants | filter:queryVariants">
+                                <a class="list-group-item" href=#/product/{{LineItem.Product.ViewName}}/{{LineItem.Product.InteropID}}/{{v.InteropID}}>
+                                    <h5 class="list-group-item-heading">{{v.ExternalID}}</h5>
+                                    <p class="list-group-item-text small"><small><span ng-show="v.Description" ng-bind-html="trustedDescription(v)" /></small></p>
+                                    <div ng-show="LineItem.Product.DisplayInventory && LineItem.Product.IsVariantLevelInventory">
+                                        {{v.QuantityAvailable}} in stock
+                                    </div>
+                                </a>
+                                <div ng-if="allowAddFromVariantList" class="list-group-item" style="border-top-left-radius:0; border-top-right-radius:0;">
+                                    <h4 class="pull-left text-success" style="margin:0;">{{variantLineItems[v.InteropID].LineTotal | currency}}</h4>
+                                    <quantityfield required="false" calculated="calcVariantLineItems" lineitem="variantLineItems[v.InteropID]" class="quantity pull-right" />
+                                    <div style="padding:5px 15px; margin:2px 15px;" class="alert alert-danger pull-right" ng-show="variantLineItems[v.InteropID].qtyError">{{variantLineItems[v.InteropID].qtyError}}</div>
+                                    <div style="clear:both;"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <br/>
+                    <div id="451_list_vspec" ng-show="allowAddToOrder">
+                        <customselectionfield ng-if="LineItem.Specs.DECORATION" customfield="LineItem.Specs.DECORATION" change="displayMarkup()"></customselectionfield><span ng-show="selectedDecorationOption">(+{{selectedDecorationOption.Markup | currency}})</span>
+                        <customselectionfield ng-if="LineItem.Specs.Size" customfield="LineItem.Specs.Size"></customselectionfield>
+                        <customselectionfield ng-if="LineItem.Specs.SIZE" customfield="LineItem.Specs.SIZE"></customselectionfield><span ng-show="selectedSizeOption">(+{{selectedSizeOption.Markup | currency}})</span><br />
+                        <a href="http://www.four51.com/Themes/Custom/78ad1fd0-1ab1-4bd2-9a1a-a556f7bc77dc/MarketingStore/docs/Chef_Works_Sizing_Chart.pdf" target="_blank">Click here for size chart</a>
+                        <customselectionfield ng-if="LineItem.Specs.PERSONALIZATION" customfield="LineItem.Specs.PERSONALIZATION"></customselectionfield><span ng-show="selectedPersonalizationOption">(+{{selectedPersonalizationOption.Markup | currency}})</span>
+                        <customtextfield customfield="LineItem.Specs.NAME" ng-show="selectedPersonalizationOption.Value.indexOf('NAME') > -1"></customtextfield>
+                        <customtextfield customfield="LineItem.Specs.TITLE" ng-show="selectedPersonalizationOption.Value.indexOf('TITLE') > -1"></customtextfield>
+                        <customtextfield customfield="LineItem.Specs['DIVISION NAME']" ng-show="selectedPersonalizationOption.Value.indexOf('DIVISION') > -1"></customtextfield>
+                    </div>
+                    <div>
+                        <strong>Unit of Measure: </strong>&nbsp;Each<br />
+                        <strong>{{StaticSpecGroups.Specs.Specs.spec1.Value}}</strong> <br />
+                        <strong>Estimated Days to Ship: </strong>&nbsp;10 Business Days<br />
+                    </div>
+                    <div class="form-group" ng-show="allowAddToOrder">
+                        <span class="text-info" ng-hide="allowAddFromVariantList">Order Quantity:</span>
+                        <quantityfield ng-if="!allowAddFromVariantList" required="true" lineitem="LineItem" class="quantity" />
+                    </div>
+                    <p ng-hide="LineItem.Product.DisplayInventory && (LineItem.Variant || LineItem.Product.Variants.length == 0)">
+                        <strong>Non-Stock</strong>
+                    </p>
+                    <p ng-show="LineItem.Product.DisplayInventory && (LineItem.Variant || LineItem.Product.Variants.length == 0)">
+                        <!-- nothing is accomodating the 0 level inventory and the custom message to be displayed -->
+                        <strong>Stock </strong>- current available inventory: {{inventoryDisplay(LineItem.Product, LineItem.Variant)}}
+                    </p>
+                    <div ng-show="allowAddToOrder">
+                        <p class="alert alert-danger" ng-show="LineItem.qtyError">
+                            {{LineItem.qtyError}}
+                        </p>
+                        <p class="alert alert-danger" ng-show="LineItem.PriceSchedule.MinQuantity > 1">
+                            The minimum quantity for order is {{LineItem.PriceSchedule.MinQuantity}}
+                        </p>
+                        <p class="alert alert-danger" ng-show="LineItem.PriceSchedule.MaxQuantity">
+                            The maximum quantity for order is  {{LineItem.PriceSchedule.MaxQuantity}}
+                        </p>
+                        <p class="alert alert-warning" ng-show="addToOrderForm.$invalid" >
+                            Product is missing required fields for Add to Cart.
+                        </p>
+                        <p class="alert alert-warning" ng-show="addToOrderError">
+                            {{addToOrderError}}
+                        </p>
+                    </div>
+
+                </div>
+                <div class="panel-footer">
+                    <div class="col-md-6 text-center">
+                        <h3 ng-show="LineItem.LineTotal || variantLineItemsOrderTotal" style="margin-top:0; display:inline-block;" ng-if="!(user.Permissions.contains('HidePricing'))">Total:</h3 >
+                        <h3 class="text-success" style="margin:0; padding:0; display:inline-block;" ng-if="!(user.Permissions.contains('HidePricing'))">
+                            {{LineItem.LineTotal | currency}}{{variantLineItemsOrderTotal | currency}}
+                        </h3>
+                    </div>
+                    <div class="col-md-6">
+                        <button type="button" id="451_btn_orderadd" ng-disabled="addToOrderForm.$invalid" ng-click="addToOrder(LineItem)" class="btn btn-primary">
+                            {{addToOrderText}}
+                        </button>
+                    </div>
+                </div>
+                <div ng-show="LineItem.Product.Type == 'VariableText'">
+                    <button class="btn btn-xs btn-warning" redirect="/product/{{LineItem.Product.ViewName}}/{{LineItem.Product.InteropID}}/{{LineItem.Variant.InteropID}}/edit">Edit</button>
+                    <button class="btn btn-xs btn-warning" redirect="{{LineItem.Variant.ProofUrl}}">View PDF</button>
+                    <button type="button" ng-show="!LineItem.Variant" class="btn btn-xs btn-danger" redirect="/product/{{LineItem.Product.ViewName}}/{{LineItem.Product.InteropID}}/new/edit" tabindex="-1">Create New</button>
+                </div>
+            </div>
+        </form>
+        <tabset>
+            <tab heading="Description">
+                <h4 ng-show="LineItem.Product.ExternalID" class="text-info" style="margin:0;">{{LineItem.Product.ExternalID}}</h4><br/>
+                <p ng-bind-html="trustedDescription(LineItem.Product)" />
+                <p ng-show="LineItem.Variant.Description" ng-bind-html="trustedDescription(LineItem.Variant)" />
+            </tab>
+            <tab heading="Specifications">
+                <staticspecstable ng-show="StaticSpecGroups && user.Permissions.contains('ViewNonCustomizableSpecs')" specgroups="StaticSpecGroups" length="LineItem.Product.StaticSpecLength"/>
+            </tab>
+        </tabset>
+    </div>
+</section>

@@ -87,7 +87,12 @@
                                             <i class="fa fa-calendar"></i>
                                         </div>
                                         <div class="col-xs-12 col-sm-6" ng-if="user.Permissions.contains('CostCenterPerLine')">
+<<<<<<< HEAD
+
                                             <label class="required">Bill-To Cost Center</label>
+=======
+                                            <label class="required">Cost Center</label>
+>>>>>>> ec4d1f5d4b44dc7a4815d8903a0b6e3bd4e75e7d
                                             <select class="form-control" required ng-if="user.CostCenters.length > 1 && !user.Permissions.contains('FreeFormCostCenter')" ng-options="center.Name as center.Name for center in user.CostCenters" ng-model="item.CostCenter"></select>
                                             <input class="form-control view-form-icon" ng-if="user.Permissions.contains('FreeFormCostCenter')" ng-model="item.CostCenter" type='text' required placeholder="Bill-To Cost Center" />
                                             <span ng-if="user.CostCenters.length == 1 && !user.Permissions.contains('FreeFormCostCenter')">{{item.CostCenter}}</span>

@@ -283,7 +283,7 @@ four51.app.factory('ProductDisplayService', function($451, $sce, Variant, Produc
 	}
 
 	function productViewName(p){
-		p.ViewName = staticSpecSPAConfig(p, 'ViewName') || 'default';
+		p.ViewName = staticSpecSPAConfig(p, 'ViewName') || 'usfood';
 	}
 	function staticSpecSPAConfig(product, specName){
 		if(!product.StaticSpecGroups)

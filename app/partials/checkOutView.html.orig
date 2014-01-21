@@ -1,7 +1,6 @@
 <section class="container check-out-view">
     <hr />
     <loadingindicator ng-show="displayLoadingIndicator" title="Please wait while we update your order" />
-    <div class="panel panel-primary cart-view-summary col-md-4 col-md-offset-1 col-md-push-7">
     <div class="panel panel-primary view-summary col-md-4 col-md-offset-1 col-md-push-7">
         <div class="panel-heading">
             <h3 class="panel-title panel-primary">
@@ -12,10 +11,11 @@
             <loadingindicator ng-show="couponLoadingIndicator" title="Please wait while we verify and apply your promotion code" />
             <loadingindicator ng-show="couponRemoveIndicator" title="Please wait while we remove your promotion code" />
             <div ng-if="!(user.Permissions.contains('HidePricing'))">
-                <p><span class="text-info">Items</span> {{currentOrder.LineItems.length}}</p>
-                <p><span class="text-info">Subtotal</span> {{currentOrder.Subtotal | currency}}</p>
-                <p><span class="text-info">Shipping Costs</span> {{currentOrder.ShippingCost | currency}}</p>
-                <p><span class="text-info">Tax</span> {{currentOrder.Tax || 0 | currency}}</p>
+<<<<<<< HEAD
+                <p><span class="text-info">Items:</span> {{currentOrder.LineItems.length}}</p>
+                <p><span class="text-info">Subtotal:</span> {{currentOrder.Subtotal | currency}}</p>
+                <p><span class="text-info">Shipping Costs:</span> {{currentOrder.ShippingCost | currency}}</p>
+                <p><span class="text-info">Tax:</span> {{currentOrder.Tax || 0 | currency}}</p>
                 <p>
                     <span class="text-info">Ship To:</span>
                     <p ng-show="ShipAddress.AddressName"><small>{{ShipAddress.AddressName}}</small></p>
@@ -29,6 +29,12 @@
                 <p><span class="text-info">Bill-To Cost Center:</span> {{currentOrder.CostCenter}}</p>
                 <p><span class="text-info">Ship-To Cost Center:</span> {{currentOrder.CostCenter}}</p>
                 <p><span class="text-info">Contact Phone:</span> {{currentOrder.OrderFields[0].Value}}</p>
+=======
+                <p><span class="text-info">Items</span> {{currentOrder.LineItems.length}}</p>
+                <p><span class="text-info">Subtotal</span> {{currentOrder.Subtotal | currency}}</p>
+                <p><span class="text-info">Shipping Costs</span> {{currentOrder.ShippingCost | currency}}</p>
+                <p><span class="text-info">Tax</span> {{currentOrder.Tax || 0 | currency}}</p>
+>>>>>>> ec4d1f5d4b44dc7a4815d8903a0b6e3bd4e75e7d
                 <div ng-show="user.Permissions.contains('ViewPromotions')">
                     <div ng-show="!currentOrder.Coupon">
                         <div class="form-group view-form-icon">
