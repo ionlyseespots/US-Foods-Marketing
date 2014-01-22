@@ -30,8 +30,4 @@ four51.app.controller('CategoryCtrl', function ($routeParams, $sce, $scope, $451
         $('.fa').tooltip();
     }
 
-	$scope.slides = ['http://www.four51.com/Themes/Custom/78ad1fd0-1ab1-4bd2-9a1a-a556f7bc77dc/MarketingStore/Banners/VAL-ADD-SVS.jpg',
-		'http://www.four51.com/Themes/Custom/78ad1fd0-1ab1-4bd2-9a1a-a556f7bc77dc/MarketingStore/Banners/MO-CLEARANCE.jpg',
-		'http://www.four51.com/Themes/Custom/78ad1fd0-1ab1-4bd2-9a1a-a556f7bc77dc/MarketingStore/Banners/USF-PROSPECTS.jpg'];
-
 });

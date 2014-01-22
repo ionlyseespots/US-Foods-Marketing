@@ -22,11 +22,23 @@
         <!--VARIANT LIST TABLE!-->
         <form name="addToOrderForm">
             <div class="panel panel-default">
-                <div ng-show="LineItem.PriceSchedule">
-                    <priceScheduleTable ps='LineItem.PriceSchedule' p='LineItem.Product'/>
-                    <div class="alert alert-info"><small>Note: Price may be adjusted based on the options you select. Item Total will reflect these adjustments.</small></div>
+                <div class="panel-body">
+                    <tabset>
+                        <tab heading="Description">
+                            <h4 ng-show="LineItem.Product.ExternalID" class="text-info" style="margin:0;">{{LineItem.Product.ExternalID}}</h4><br/>
+                            <p ng-bind-html="trustedDescription(LineItem.Product)" />
+                            <p ng-show="LineItem.Variant.Description" ng-bind-html="trustedDescription(LineItem.Variant)" />
+                        </tab>
+                        <tab heading="Specifications">
+                            <staticspecstable ng-show="StaticSpecGroups && user.Permissions.contains('ViewNonCustomizableSpecs')" specgroups="StaticSpecGroups" length="LineItem.Product.StaticSpecLength"/>
+                        </tab>
+                    </tabset>
                 </div>
-                <div class="panel-body" style="position: relative;">
+                <div class="panel-body" ng-show="LineItem.PriceSchedule">
+                    <priceScheduleTable ps='LineItem.PriceSchedule' p='LineItem.Product'/>
+                    <p class="alert-info"><small>Note: Price may be adjusted based on the options you select. Item Total will reflect these adjustments.</small></p>
+                </div>
+                <div class="panel-body">
                     <loadingindicator ng-show="addToOrderIndicator" title="Adding product to cart"/>
                     <div ng-if="LineItem.Product.Variants.length > 0 && !LineItem.Variant">
                         <div class="row">
@@ -46,13 +58,11 @@
                                 <div ng-if="allowAddFromVariantList" class="list-group-item" style="border-top-left-radius:0; border-top-right-radius:0;">
                                     <h4 class="pull-left text-success" style="margin:0;">{{variantLineItems[v.InteropID].LineTotal | currency}}</h4>
                                     <quantityfield required="false" calculated="calcVariantLineItems" lineitem="variantLineItems[v.InteropID]" class="quantity pull-right" />
-                                    <div style="padding:5px 15px; margin:2px 15px;" class="alert alert-danger pull-right" ng-show="variantLineItems[v.InteropID].qtyError">{{variantLineItems[v.InteropID].qtyError}}</div>
-                                    <div style="clear:both;"></div>
+                                    <p class="alert alert-danger pull-right" ng-show="variantLineItems[v.InteropID].qtyError">{{variantLineItems[v.InteropID].qtyError}}</p>
                                 </div>
                             </div>
                         </div>
                     </div>
-                    <br/>
                     <div id="451_list_vspec" ng-show="allowAddToOrder">
                         <customselectionfield ng-if="LineItem.Specs.DECORATION" customfield="LineItem.Specs.DECORATION" change="displayMarkup()"></customselectionfield><span ng-show="selectedDecorationOption">(+{{selectedDecorationOption.Markup | currency}})</span>
                         <customselectionfield ng-if="LineItem.Specs.Size" customfield="LineItem.Specs.Size"></customselectionfield>
@@ -63,11 +73,11 @@
                         <customtextfield customfield="LineItem.Specs.TITLE" ng-show="selectedPersonalizationOption.Value.indexOf('TITLE') > -1"></customtextfield>
                         <customtextfield customfield="LineItem.Specs['DIVISION NAME']" ng-show="selectedPersonalizationOption.Value.indexOf('DIVISION') > -1"></customtextfield>
                     </div>
-                    <div>
+                    <p>
                         <strong>Unit of Measure: </strong>&nbsp;Each<br />
                         <strong>{{StaticSpecGroups.Specs.Specs.spec1.Value}}</strong> <br />
                         <strong>Estimated Days to Ship: </strong>&nbsp;10 Business Days<br />
-                    </div>
+                    </p>
                     <div class="form-group" ng-show="allowAddToOrder">
                         <span class="text-info" ng-hide="allowAddFromVariantList">Order Quantity:</span>
                         <quantityfield ng-if="!allowAddFromVariantList" required="true" lineitem="LineItem" class="quantity" />
@@ -99,14 +109,14 @@
 
                 </div>
                 <div class="panel-footer">
-                    <div class="col-md-6 text-center">
+                    <div class="col-md-6">
                         <h3 ng-show="LineItem.LineTotal || variantLineItemsOrderTotal" style="margin-top:0; display:inline-block;" ng-if="!(user.Permissions.contains('HidePricing'))">Total:</h3 >
                         <h3 class="text-success" style="margin:0; padding:0; display:inline-block;" ng-if="!(user.Permissions.contains('HidePricing'))">
                             {{LineItem.LineTotal | currency}}{{variantLineItemsOrderTotal | currency}}
                         </h3>
                     </div>
                     <div class="col-md-6">
-                        <button type="button" id="451_btn_orderadd" ng-disabled="addToOrderForm.$invalid" ng-click="addToOrder(LineItem)" class="btn btn-primary">
+                        <button type="button" id="451_btn_orderadd" ng-disabled="addToOrderForm.$invalid" ng-click="addToOrder(LineItem)" class="btn btn-primary pull-right">
                             {{addToOrderText}}
                         </button>
                     </div>
@@ -118,15 +128,5 @@
                 </div>
             </div>
         </form>
-        <tabset>
-            <tab heading="Description">
-                <h4 ng-show="LineItem.Product.ExternalID" class="text-info" style="margin:0;">{{LineItem.Product.ExternalID}}</h4><br/>
-                <p ng-bind-html="trustedDescription(LineItem.Product)" />
-                <p ng-show="LineItem.Variant.Description" ng-bind-html="trustedDescription(LineItem.Variant)" />
-            </tab>
-            <tab heading="Specifications">
-                <staticspecstable ng-show="StaticSpecGroups && user.Permissions.contains('ViewNonCustomizableSpecs')" specgroups="StaticSpecGroups" length="LineItem.Product.StaticSpecLength"/>
-            </tab>
-        </tabset>
     </div>
 </section>

@@ -4,9 +4,11 @@
             <div ng-class="{'col-md-6': length > 1}" >
                 <ul ng-if="$odd" class="list-group" ng-repeat="sg in specgroups">
                     <li class="list-group-item">
-                        <div class="text-left" ng-show="s.VisibleToCustomer" ng-repeat="s in sg.Specs">
+                        <div ng-show="s.VisibleToCustomer" ng-repeat="s in sg.Specs">
+                            <p>
                             <a ng-if="s.FileURL" href={{s.FileURL}}>{{s.Value}}</a>
                             <span ng-if="!s.FileURL">{{s.Value}}</span>
+                            </p>
                         </div>
                     </li>
                 </ul>

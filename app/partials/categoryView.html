@@ -25,13 +25,6 @@
             </ul>
         </nav>
     </aside>
-    <div class="Carousel" style="width:651px;height:201px;">
-        <carousel interval="5000">
-            <slide ng-repeat="slide in slides">
-                <img ng-src="{{slide}}" style="margin:auto;">
-            </slide>
-        </carousel>
-    </div>
     <div class="cat-body" ng-class="{ 'move-cat-body col-sm-9 col-collapse': showMega }">
         <div class="category-product product-navigation" ng-show="currentCategory" style="position: relative;">
             <loadingindicator ng-show="categoryLoadingIndicator" title="Please wait while we fetch all categories" />

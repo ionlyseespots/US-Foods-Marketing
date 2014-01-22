@@ -47,3 +47,58 @@ li.cart span.badge {
     top: 10px;
     z-index: 999999999;
 }
+
+/* TODO: gift cards has a link inside a link? - I understand why but this will heed some help */
+h5 span a {
+    padding: 0 !important;
+}
+
+/* product view */
+
+.view-tr .row {
+    margin: 0;
+}
+.quantity input {
+    text-align: left;
+}
+
+
+/* tabs */
+
+ul.nav-tabs li a:hover {
+    cursor: pointer;
+}
+
+ul.nav-tabs li.active a, ul.nav-tabs li.active a:hover {
+    background-color: #fff;
+}
+
+
+/* footer links */
+
+footer ul li {
+    display: inline-block;
+    float: left;
+    margin-left: 10px;
+}
+
+footer ul li a {
+    color: #5C8727;
+    display: block;
+    font-weight: bold;
+}
+
+
+/* carousel */
+
+.carousel-indicators {
+    bottom: -50px !important;
+}
+
+.carousel-indicators .active {
+    background-color: #5C8727 !important;
+}
+
+.carousel-indicators li {
+    border: 1px solid #d6d6d6;
+}
